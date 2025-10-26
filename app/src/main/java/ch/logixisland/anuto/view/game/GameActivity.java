@@ -23,6 +23,10 @@ import ch.logixisland.anuto.engine.logic.GameEngine;
 import ch.logixisland.anuto.engine.theme.ActivityType;
 import ch.logixisland.anuto.view.AnutoActivity;
 import ch.logixisland.anuto.view.ApplySafeInsetsHandler;
+// 添加支付相关的导入
+import android.content.Intent;
+import android.content.SharedPreferences;
+import ch.logixisland.anuto.pay.ui.PaymentActivity; // 添加这一行导入
 
 public class GameActivity extends AnutoActivity {
 
@@ -52,6 +56,20 @@ public class GameActivity extends AnutoActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // ========== 简化的支付检查代码开始 ==========
+        SharedPreferences prefs = getSharedPreferences("payment_prefs", MODE_PRIVATE);
+        boolean isPaymentCompleted = prefs.getBoolean("is_payment_completed", false);
+
+        if (!isPaymentCompleted) {
+            // 未支付，跳转到支付界面
+            Intent intent = new Intent(this, PaymentActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        // ========== 简化的支付检查代码结束 ==========
+
+        // 已支付，继续正常游戏流程
         mGameLoader.autoLoadGame();
 
         super.onCreate(savedInstanceState);

@@ -27,6 +27,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- 添加 PaymentActivity 注册 -->
+        <activity
+            android:name=".pay.ui.PaymentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.DeviceDefault"
+            android:exported="false" />
+
         <activity
             android:name=".view.game.MenuActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
