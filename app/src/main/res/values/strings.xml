@@ -120,4 +120,8 @@
     <string name="enemy_sprinter">Sprinter</string>
     <string name="enemy_flyer">Flyer</string>
     <string name="enemy_healer">Healer</string>
+
+    <string name="dolphin_damage">海豚伤害</string>
+    <string name="dolphin_count">海豚数量</string>
+    <string name="makoto_dolphin">海豚塔</string>
 </resources>

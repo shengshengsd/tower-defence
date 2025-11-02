@@ -52,6 +52,11 @@
     <attr name="soldier" format="reference" />
     <attr name="sprinter" format="reference" />
     <attr name="teleportTower" format="reference" />
+    <attr name="makotoDolphinBase" format="reference" />
+    <attr name="makotoDolphinTower" format="reference" />
+    <attr name="dolphinSummon" format="reference" />
+    <attr name="waterShot" format="reference" />
+
 
     <attr name="backgroundHeader" format="reference" />
     <attr name="backgroundPopup" format="reference" />

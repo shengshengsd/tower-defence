@@ -53,6 +53,12 @@
         <item name="soldier">@drawable/soldier_dk</item>
         <item name="sprinter">@drawable/sprinter_dk</item>
         <item name="teleportTower">@drawable/teleport_tower_dk</item>
+
+        <!-- 新增的海豚相关资源 -->
+        <item name="makotoDolphinBase">@drawable/makoto_dolphin_base_dk</item>
+        <item name="makotoDolphinTower">@drawable/makoto_dolphin_tower_dk</item>
+        <item name="dolphinSummon">@drawable/dolphin_summon_dk</item>
+        <item name="waterShot">@drawable/water_shot_dk</item>
     </style>
 
     <style name="DarkTheme.Game" parent="@android:style/Theme.NoTitleBar.Fullscreen">

@@ -42,6 +42,7 @@ import ch.logixisland.anuto.entity.tower.DualCanon;
 import ch.logixisland.anuto.entity.tower.GlueGun;
 import ch.logixisland.anuto.entity.tower.GlueTower;
 import ch.logixisland.anuto.entity.tower.MachineGun;
+import ch.logixisland.anuto.entity.tower.MakotoDolphin;
 import ch.logixisland.anuto.entity.tower.MineLayer;
 import ch.logixisland.anuto.entity.tower.Mortar;
 import ch.logixisland.anuto.entity.tower.RocketLauncher;
@@ -128,6 +129,9 @@ public class GameFactory {
         mEntityRegistry.registerEntity(new GlueTower.Factory(), new GlueTower.Persister());
         mEntityRegistry.registerEntity(new GlueGun.Factory(), new GlueGun.Persister());
         mEntityRegistry.registerEntity(new Teleporter.Factory(), new Teleporter.Persister());
+
+        // 新增海豚塔注册
+        mEntityRegistry.registerEntity(new MakotoDolphin.Factory(), new MakotoDolphin.Persister());
     }
 
     private void initializeBusiness(Context context) {
