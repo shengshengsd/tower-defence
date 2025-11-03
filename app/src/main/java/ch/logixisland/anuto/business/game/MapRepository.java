@@ -35,6 +35,9 @@ public class MapRepository {
         mMapInfos.add(new MapInfo("spiral2", R.string.map_spiral2_name, R.raw.map_spiral2));
         mMapInfos.add(new MapInfo("nou", R.string.map_nou_name, R.raw.map_nou));
         mMapInfos.add(new MapInfo("highscore", R.string.map_highscore_name, R.raw.map_highscore));
+
+        // 添加您的新地图 - 在列表末尾添加这行
+        mMapInfos.add(new MapInfo("map1", R.string.map_1_name, R.raw.map_1));
     }
 
     public List<MapInfo> getMapInfos() {
