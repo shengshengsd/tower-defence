@@ -90,8 +90,6 @@
     <string name="map_spiral2_name">Spiral v2</string>
     <string name="map_nou_name">No, U</string>
     <string name="map_highscore_name">Highscore!</string>
-    <string name="map_1_name">Map 1</string>
-
     <string name="press_back_button_again_toast">Press back button again to exit</string>
 
     <string name="tutorial">Getting Started</string>
@@ -122,4 +120,24 @@
     <string name="enemy_sprinter">Sprinter</string>
     <string name="enemy_flyer">Flyer</string>
     <string name="enemy_healer">Healer</string>
+
+    <string name="dolphin_damage">Dolphin Damage</string>
+    <string name="dolphin_count">Dolphin Count</string>
+    <string name="makoto_dolphin">Dolphin Tower</string>
+
+    <!-- Leaderboard related strings -->
+    <string name="leaderboard">Leaderboard</string>
+    <string name="leaderboard_title">Leaderboard</string>
+    <string name="rank">Rank</string>
+    <string name="score_value">Score</string>
+    <string name="wave_number">Wave</string>
+    <string name="lives_count">Lives</string>
+    <string name="date">Date</string>
+    <string name="no_entries">No entries</string>
+    <string name="clear_leaderboard">Clear Leaderboard</string>
+    <string name="clear_leaderboard_warning">Are you sure you want to clear the leaderboard?</string>
+    <string name="leaderboard_entry_format">#%1$d</string>
+    <string name="leaderboard_map_all">All Maps</string>
+    <string name="close">Close</string>
+
 </resources>

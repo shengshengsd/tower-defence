@@ -3,6 +3,9 @@ package ch.logixisland.anuto;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+// 添加导入
+import ch.logixisland.anuto.business.game.LeaderboardRepository;
+
 import ch.logixisland.anuto.business.game.GameLoader;
 import ch.logixisland.anuto.business.game.GameSaver;
 import ch.logixisland.anuto.business.game.GameSpeed;
@@ -42,6 +45,7 @@ import ch.logixisland.anuto.entity.tower.DualCanon;
 import ch.logixisland.anuto.entity.tower.GlueGun;
 import ch.logixisland.anuto.entity.tower.GlueTower;
 import ch.logixisland.anuto.entity.tower.MachineGun;
+import ch.logixisland.anuto.entity.tower.MakotoDolphin;
 import ch.logixisland.anuto.entity.tower.MineLayer;
 import ch.logixisland.anuto.entity.tower.Mortar;
 import ch.logixisland.anuto.entity.tower.RocketLauncher;
@@ -81,6 +85,9 @@ public class GameFactory {
     private GameSpeed mSpeedManager;
     private GameState mGameState;
     private TutorialControl mTutorialControl;
+
+    // 新增：排行榜仓库
+    private LeaderboardRepository mLeaderboardRepository;
 
     public GameFactory(Context context) {
         PreferenceManager.setDefaultValues(context, R.xml.settings, false);
@@ -128,6 +135,9 @@ public class GameFactory {
         mEntityRegistry.registerEntity(new GlueTower.Factory(), new GlueTower.Persister());
         mEntityRegistry.registerEntity(new GlueGun.Factory(), new GlueGun.Persister());
         mEntityRegistry.registerEntity(new Teleporter.Factory(), new Teleporter.Persister());
+
+        // 新增海豚塔注册
+        mEntityRegistry.registerEntity(new MakotoDolphin.Factory(), new MakotoDolphin.Persister());
     }
 
     private void initializeBusiness(Context context) {
@@ -139,8 +149,20 @@ public class GameFactory {
         mTowerSelector = new TowerSelector(mGameEngine, mScoreBoard);
         mGameLoader = new GameLoader(context, mGameEngine, mGamePersister, mViewport, mEntityRegistry, mMapRepository, mSaveGameRepository);
         mHighScores = new HighScores(context, mGameEngine, mScoreBoard, mGameLoader);
-        mGameState = new GameState(mScoreBoard, mHighScores, mTowerSelector);
+
+        // 新增：创建排行榜仓库（必须在GameState之前创建）
+        mLeaderboardRepository = new LeaderboardRepository(context);
+
+        // 修改：创建GameState的临时实例（先不设置WaveManager）
+        mGameState = new GameState(mScoreBoard, mHighScores, mTowerSelector, mLeaderboardRepository, mGameLoader);
+
+        // 创建WaveManager（需要GameState）
         mWaveManager = new WaveManager(mGameEngine, mScoreBoard, mGameState, mEntityRegistry, mTowerAging);
+
+        // 设置GameState的WaveManager引用
+        mGameState.setWaveManager(mWaveManager);
+
+        // 其他业务组件的创建
         mGameSaver = new GameSaver(mGameEngine, mGameLoader, mGamePersister, mRenderer, mWaveManager, mScoreBoard, mSaveGameRepository);
         mTowerControl = new TowerControl(mGameEngine, mScoreBoard, mTowerSelector, mEntityRegistry);
         mTowerInserter = new TowerInserter(mGameEngine, mGameState, mEntityRegistry, mTowerSelector, mTowerAging, mScoreBoard);
@@ -227,4 +249,8 @@ public class GameFactory {
         return mGameSaver;
     }
 
+    // 新增：获取排行榜仓库的方法
+    public LeaderboardRepository getLeaderboardRepository() {
+        return mLeaderboardRepository;
+    }
 }

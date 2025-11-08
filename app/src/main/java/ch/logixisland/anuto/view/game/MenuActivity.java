@@ -20,6 +20,7 @@ import ch.logixisland.anuto.view.load.LoadGameActivity;
 import ch.logixisland.anuto.view.map.ChangeMapActivity;
 import ch.logixisland.anuto.view.setting.SettingsActivity;
 import ch.logixisland.anuto.view.stats.EnemyStatsActivity;
+import ch.logixisland.anuto.view.leaderboard.LeaderboardActivity;
 
 public class MenuActivity extends AnutoActivity implements View.OnClickListener, View.OnTouchListener {
 
@@ -42,6 +43,7 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
     private Button btn_load_game;
     private Button btn_enemy_stats;
     private Button btn_settings;
+    private Button btn_leaderboard; // 添加排行榜按钮
 
     public MenuActivity() {
         GameFactory factory = AnutoApplication.getInstance().getGameFactory();
@@ -67,6 +69,7 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
         btn_load_game = findViewById(R.id.btn_load_game);
         btn_enemy_stats = findViewById(R.id.btn_enemy_stats);
         btn_settings = findViewById(R.id.btn_settings);
+        btn_leaderboard = findViewById(R.id.btn_leaderboard); // 初始化排行榜按钮
 
         activity_menu = findViewById(R.id.activity_menu);
         menu_layout = findViewById(R.id.menu_layout);
@@ -77,6 +80,7 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
         btn_load_game.setOnClickListener(this);
         btn_enemy_stats.setOnClickListener(this);
         btn_settings.setOnClickListener(this);
+        btn_leaderboard.setOnClickListener(this); // 设置排行榜按钮点击监听
         btn_save_game.setEnabled(mGameState.isGameStarted());
         btn_load_game.setEnabled(!mSaveGameRepository.getSaveGameInfos().isEmpty());
 
@@ -120,6 +124,13 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
         if (view == btn_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, REQUEST_SETTINGS);
+            return;
+        }
+
+        if (view == btn_leaderboard) {
+            // 添加排行榜按钮点击事件，这里实际使用了 LeaderboardActivity
+            Intent intent = new Intent(this, LeaderboardActivity.class);
+            startActivity(intent);
             return;
         }
     }

@@ -136,38 +136,10 @@ public class GameLoader implements ErrorListener {
         GameMap map = new GameMap(KeyValueStore.fromResources(mContext.getResources(), mapInfo.getMapDataResId()));
         mGameEngine.setGameMap(map);
 
-        // 修改点：增强波次数据加载的错误处理和日志
-        KeyValueStore waveData = null;
-        try {
-            waveData = KeyValueStore.fromResources(mContext.getResources(), R.raw.waves_config);
-            Log.d(TAG, "Wave data loaded successfully from R.raw.waves_config");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to load wave data from R.raw.waves_config", e);
-            // 可以在这里添加回退逻辑，例如使用默认波次数据
-            // 例如：waveData = KeyValueStore.fromResources(mContext.getResources(), R.raw.waves_fallback);
-            // 但首先确保资源文件正确，所以这里直接抛出异常或处理错误
-            throw new RuntimeException("Critical: Wave data resource not found or invalid!", e);
-        }
-
-        if (waveData == null) {
-            Log.e(TAG, "Wave data is null after loading");
-            throw new RuntimeException("Wave data is null");
-        }
-
+        KeyValueStore waveData = KeyValueStore.fromResources(mContext.getResources(), R.raw.waves);
         List<WaveInfo> waveInfos = new ArrayList<>();
-        try {
-            List<KeyValueStore> waveList = waveData.getStoreList("waves");
-            if (waveList == null || waveList.isEmpty()) {
-                Log.e(TAG, "No 'waves' array found in wave data");
-                throw new RuntimeException("Invalid wave data structure: missing 'waves' array");
-            }
-            for (KeyValueStore data : waveList) {
-                waveInfos.add(new WaveInfo(data));
-            }
-            Log.d(TAG, "Wave infos parsed: " + waveInfos.size() + " waves");
-        } catch (Exception e) {
-            Log.e(TAG, "Error parsing wave data", e);
-            throw new RuntimeException("Failed to parse wave data", e);
+        for (KeyValueStore data : waveData.getStoreList("waves")) {
+            waveInfos.add(new WaveInfo(data));
         }
         mGameEngine.setWaveInfos(waveInfos);
 
@@ -184,7 +156,7 @@ public class GameLoader implements ErrorListener {
             listener.gameLoaded();
         }
 
-        Log.d(TAG, "Game loaded successfully.");
+        Log.d(TAG, "Game loaded.");
     }
 
     private void initializeMap(GameMap map) {
@@ -205,4 +177,5 @@ public class GameLoader implements ErrorListener {
             mSaveGameRepository.getAutoSaveStateFile().delete();
         }
     }
+
 }
