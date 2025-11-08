@@ -15,6 +15,7 @@ import ch.logixisland.anuto.engine.logic.entity.EntityRegistry;
 import ch.logixisland.anuto.engine.logic.map.MapPath;
 import ch.logixisland.anuto.engine.logic.map.WaveInfo;
 import ch.logixisland.anuto.engine.logic.persistence.Persister;
+import ch.logixisland.anuto.engine.render.PathDrawable;
 import ch.logixisland.anuto.util.container.KeyValueStore;
 
 public class WaveManager implements Persister, GameState.Listener {
@@ -47,6 +48,9 @@ public class WaveManager implements Persister, GameState.Listener {
     private final List<WaveAttender> mActiveWaves = new ArrayList<>();
     private final List<Listener> mListeners = new CopyOnWriteArrayList<>();
 
+    // 新增：路径绘制对象引用
+    private PathDrawable mPathDrawable;
+
     public WaveManager(GameEngine gameEngine, ScoreBoard scoreBoard, GameState gameState,
                        EntityRegistry entityRegistry, TowerAging towerAging) {
         mGameEngine = gameEngine;
@@ -58,6 +62,12 @@ public class WaveManager implements Persister, GameState.Listener {
         mEnemyDefaultHealth = new EnemyDefaultHealth(entityRegistry);
 
         mGameState.addListener(this);
+    }
+
+    // 新增：设置路径绘制对象的方法
+    public void setPathDrawable(PathDrawable pathDrawable) {
+        mPathDrawable = pathDrawable;
+        Log.d("WaveManager", "PathDrawable set: " + (pathDrawable != null ? "not null" : "null"));
     }
 
     public int getWaveNumber() {
@@ -79,6 +89,7 @@ public class WaveManager implements Persister, GameState.Listener {
         }
 
         if (!mNextWaveReady) {
+            Log.d("WaveManager", "startNextWave: Next wave not ready, returning");
             return;
         }
 
@@ -86,6 +97,21 @@ public class WaveManager implements Persister, GameState.Listener {
         nextWaveReadyDelayed(NEXT_WAVE_MIN_DELAY);
 
         mGameState.gameStarted();
+
+        // 新增：在第一次波次开始时隐藏路径显示，并添加详细调试日志
+        Log.d("WaveManager", "startNextWave: Wave number = " + mWaveNumber + ", PathDrawable = " + (mPathDrawable != null ? "not null" : "null"));
+
+        if (mWaveNumber == 0) {
+            if (mPathDrawable != null) {
+                Log.d("WaveManager", "Hiding path display at first wave start (wave 0)");
+                mPathDrawable.setVisible(false);
+                Log.d("WaveManager", "Path visibility after hiding: " + mPathDrawable.isVisible());
+            } else {
+                Log.w("WaveManager", "Cannot hide path: PathDrawable is null at first wave start");
+            }
+        } else {
+            Log.d("WaveManager", "Not first wave (wave " + mWaveNumber + "), not hiding path");
+        }
 
         giveWaveRewardAndEarlyBonus();
         createAndStartWaveAttender();
@@ -97,6 +123,8 @@ public class WaveManager implements Persister, GameState.Listener {
         for (Listener listener : mListeners) {
             listener.waveStarted();
         }
+
+        Log.d("WaveManager", "Wave " + (mWaveNumber - 1) + " started successfully");
     }
 
     public void addListener(Listener listener) {
@@ -112,6 +140,16 @@ public class WaveManager implements Persister, GameState.Listener {
         setWaveNumber(0);
         mActiveWaves.clear();
         setNextWaveReady(true);
+
+        // 新增：游戏重置时重新显示路径，并添加调试日志
+        Log.d("WaveManager", "resetState: Resetting wave state");
+        if (mPathDrawable != null) {
+            Log.d("WaveManager", "Showing path display on game reset");
+            mPathDrawable.setVisible(true);
+            Log.d("WaveManager", "Path visibility after reset: " + mPathDrawable.isVisible());
+        } else {
+            Log.w("WaveManager", "Cannot show path: PathDrawable is null on game reset");
+        }
     }
 
     @Override
@@ -133,11 +171,12 @@ public class WaveManager implements Persister, GameState.Listener {
 
     @Override
     public void gameRestart() {
-
+        Log.d("WaveManager", "gameRestart: Game restart detected");
     }
 
     @Override
     public void gameOver() {
+        Log.d("WaveManager", "gameOver: Game over detected");
         setNextWaveReady(false);
     }
 
@@ -204,6 +243,7 @@ public class WaveManager implements Persister, GameState.Listener {
         mGameEngine.postDelayed(() -> {
             if (!mGameState.isGameOver()) {
                 setNextWaveReady(true);
+                Log.d("WaveManager", "Next wave is now ready after delay");
             }
         }, delay);
     }
@@ -244,6 +284,8 @@ public class WaveManager implements Persister, GameState.Listener {
         updateWaveModifiers(nextWave);
         nextWave.start();
         mActiveWaves.add(nextWave);
+
+        Log.d("WaveManager", "Created and started wave attender for wave " + mWaveNumber);
     }
 
     private void updateWaveExtend(WaveAttender wave, WaveInfo waveInfo) {
