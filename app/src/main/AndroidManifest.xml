@@ -64,6 +64,11 @@
             android:theme="@android:style/Theme.DeviceDefault">
         </activity>
 
+        <activity
+            android:name="ch.logixisland.anuto.view.leaderboard.LeaderboardActivity"
+            android:theme="@android:style/Theme.Dialog" />
+
+
     </application>
 
 </manifest>

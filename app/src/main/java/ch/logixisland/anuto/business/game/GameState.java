@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import ch.logixisland.anuto.business.tower.TowerSelector;
+import ch.logixisland.anuto.business.wave.WaveManager;
 import ch.logixisland.anuto.engine.logic.persistence.Persister;
 import ch.logixisland.anuto.util.container.KeyValueStore;
 
@@ -18,6 +19,9 @@ public class GameState implements ScoreBoard.Listener, Persister {
     private final ScoreBoard mScoreBoard;
     private final HighScores mHighScores;
     private final TowerSelector mTowerSelector;
+    private final LeaderboardRepository mLeaderboardRepository;
+    private final GameLoader mGameLoader;
+    private WaveManager mWaveManager; // 改为非final，通过setter设置
 
     private boolean mGameOver = false;
     private boolean mGameStarted = false;
@@ -25,12 +29,20 @@ public class GameState implements ScoreBoard.Listener, Persister {
 
     private final List<Listener> mListeners = new CopyOnWriteArrayList<>();
 
-    public GameState(ScoreBoard scoreBoard, HighScores highScores, TowerSelector towerSelector) {
+    public GameState(ScoreBoard scoreBoard, HighScores highScores, TowerSelector towerSelector,
+                     LeaderboardRepository leaderboardRepository, GameLoader gameLoader) {
         mScoreBoard = scoreBoard;
         mHighScores = highScores;
         mTowerSelector = towerSelector;
+        mLeaderboardRepository = leaderboardRepository;
+        mGameLoader = gameLoader;
 
         mScoreBoard.addListener(this);
+    }
+
+    // 新增：设置WaveManager的方法
+    public void setWaveManager(WaveManager waveManager) {
+        mWaveManager = waveManager;
     }
 
     public boolean isGameOver() {
@@ -100,6 +112,15 @@ public class GameState implements ScoreBoard.Listener, Persister {
             mFinalScore = mScoreBoard.getScore();
             mTowerSelector.setControlsEnabled(false);
 
+            // 新增：记录到排行榜
+            String currentMapId = mGameLoader.getCurrentMapId();
+            mLeaderboardRepository.addEntry(
+                    currentMapId,
+                    mFinalScore,
+                    getCurrentWaveNumber(),
+                    mScoreBoard.getLives()
+            );
+
             for (Listener listener : mListeners) {
                 listener.gameOver();
             }
@@ -114,5 +135,10 @@ public class GameState implements ScoreBoard.Listener, Persister {
                 listener.gameRestart();
             }
         }
+    }
+
+    private int getCurrentWaveNumber() {
+        // 通过 WaveManager 获取当前波数
+        return mWaveManager != null ? mWaveManager.getWaveNumber() : 0;
     }
 }
