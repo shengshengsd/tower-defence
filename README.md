@@ -33,3 +33,4 @@ Become a [beta tester](https://play.google.com/apps/testing/ch.logixisland.anuto
 - Call in the next wave using the button in the upper right corner.
   If you call in the next wave while there are still enemies in the game you receive bonus credits.
 - Make sure the enemies don't make it through the course!
+1
