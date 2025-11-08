@@ -4,11 +4,13 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-// 添加导入
 import ch.logixisland.anuto.business.game.LeaderboardRepository;
 import ch.logixisland.anuto.engine.logic.map.MapPath;
 import ch.logixisland.anuto.engine.render.PathDrawable;
 
+import ch.logixisland.anuto.business.game.CoinManager;
+import ch.logixisland.anuto.business.game.ShopManager;
+import ch.logixisland.anuto.business.game.ShopRepository;
 import ch.logixisland.anuto.business.game.GameLoader;
 import ch.logixisland.anuto.business.game.GameSaver;
 import ch.logixisland.anuto.business.game.GameSpeed;
@@ -91,10 +93,12 @@ public class GameFactory {
     private GameState mGameState;
     private TutorialControl mTutorialControl;
 
-    // 新增：排行榜仓库
-    private LeaderboardRepository mLeaderboardRepository;
+    // 新增：商店系统组件
+    private CoinManager mCoinManager;
+    private ShopRepository mShopRepository;
+    private ShopManager mShopManager;
 
-    // 新增：路径绘制对象
+    private LeaderboardRepository mLeaderboardRepository;
     private PathDrawable mPathDrawable;
 
     public GameFactory(Context context) {
@@ -144,7 +148,6 @@ public class GameFactory {
         mEntityRegistry.registerEntity(new GlueGun.Factory(), new GlueGun.Persister());
         mEntityRegistry.registerEntity(new Teleporter.Factory(), new Teleporter.Persister());
 
-        // 新增海豚塔注册
         mEntityRegistry.registerEntity(new MakotoDolphin.Factory(), new MakotoDolphin.Persister());
     }
 
@@ -158,46 +161,38 @@ public class GameFactory {
         mGameLoader = new GameLoader(context, mGameEngine, mGamePersister, mViewport, mEntityRegistry, mMapRepository, mSaveGameRepository);
         mHighScores = new HighScores(context, mGameEngine, mScoreBoard, mGameLoader);
 
-        // 新增：创建排行榜仓库（必须在GameState之前创建）
+        // 新增：创建商店系统组件
+        mCoinManager = new CoinManager(context);
+        mShopRepository = new ShopRepository(context);
+        mShopManager = new ShopManager(mCoinManager, mShopRepository, mGameEngine);
+
         mLeaderboardRepository = new LeaderboardRepository(context);
 
-        // 修改：创建GameState的临时实例（先不设置WaveManager）
-        mGameState = new GameState(mScoreBoard, mHighScores, mTowerSelector, mLeaderboardRepository, mGameLoader);
+        // 修改：更新GameState构造函数调用
+        mGameState = new GameState(mScoreBoard, mHighScores, mTowerSelector, mLeaderboardRepository, mGameLoader, mCoinManager);
 
-        // 创建WaveManager（需要GameState）
         mWaveManager = new WaveManager(mGameEngine, mScoreBoard, mGameState, mEntityRegistry, mTowerAging);
-
-        // 设置GameState的WaveManager引用
         mGameState.setWaveManager(mWaveManager);
-
-        // 关键修改：设置GameFactory引用到GameLoader
-        // 这样GameLoader可以在地图加载完成后初始化路径绘制
         mGameLoader.setGameFactory(this);
 
-        // 其他业务组件的创建
         mGameSaver = new GameSaver(mGameEngine, mGameLoader, mGamePersister, mRenderer, mWaveManager, mScoreBoard, mSaveGameRepository);
         mTowerControl = new TowerControl(mGameEngine, mScoreBoard, mTowerSelector, mEntityRegistry);
         mTowerInserter = new TowerInserter(mGameEngine, mGameState, mEntityRegistry, mTowerSelector, mTowerAging, mScoreBoard);
         mTutorialControl = new TutorialControl(context, mTowerInserter, mTowerSelector, mWaveManager);
     }
 
-    // 新增：初始化路径绘制的方法（由GameLoader在地图加载后调用）
     public void initializePathDrawable() {
         if (mGameEngine.getGameMap() != null) {
-            // 移除已存在的路径绘制对象（如果存在）
             if (mPathDrawable != null) {
                 mRenderer.remove(mPathDrawable);
                 Log.d("GameFactory", "Removed existing path drawable");
             }
 
-            // 创建新的路径绘制对象
             List<MapPath> paths = mGameEngine.getGameMap().getPaths();
             Log.d("GameFactory", "Initializing path drawable with " + paths.size() + " paths");
 
             mPathDrawable = new PathDrawable(paths);
             mRenderer.add(mPathDrawable);
-
-            // 将路径绘制对象传递给WaveManager
             mWaveManager.setPathDrawable(mPathDrawable);
 
             Log.d("GameFactory", "Path drawable successfully initialized and added to renderer");
@@ -286,17 +281,27 @@ public class GameFactory {
         return mGameSaver;
     }
 
-    // 新增：获取排行榜仓库的方法
     public LeaderboardRepository getLeaderboardRepository() {
         return mLeaderboardRepository;
     }
 
-    // 新增：获取路径绘制对象的方法
     public PathDrawable getPathDrawable() {
         return mPathDrawable;
     }
 
-    // 新增：设置路径可见性的方法
+    // 新增：获取商店系统组件的方法
+    public CoinManager getCoinManager() {
+        return mCoinManager;
+    }
+
+    public ShopRepository getShopRepository() {
+        return mShopRepository;
+    }
+
+    public ShopManager getShopManager() {
+        return mShopManager;
+    }
+
     public void setPathVisible(boolean visible) {
         if (mPathDrawable != null) {
             mPathDrawable.setVisible(visible);

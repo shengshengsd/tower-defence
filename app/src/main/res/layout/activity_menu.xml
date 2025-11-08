@@ -53,7 +53,14 @@
             android:maxLines="1"
             android:text="@string/change_map" />
 
-        <!-- 新增排行榜按钮 -->
+        <!-- 新增商店按钮 -->
+        <Button
+            android:id="@+id/btn_shop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/shop" />
+
         <Button
             android:id="@+id/btn_leaderboard"
             android:layout_width="match_parent"

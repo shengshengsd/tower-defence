@@ -21,7 +21,8 @@ public class GameState implements ScoreBoard.Listener, Persister {
     private final TowerSelector mTowerSelector;
     private final LeaderboardRepository mLeaderboardRepository;
     private final GameLoader mGameLoader;
-    private WaveManager mWaveManager; // 改为非final，通过setter设置
+    private final CoinManager mCoinManager; // 新增
+    private WaveManager mWaveManager;
 
     private boolean mGameOver = false;
     private boolean mGameStarted = false;
@@ -29,18 +30,20 @@ public class GameState implements ScoreBoard.Listener, Persister {
 
     private final List<Listener> mListeners = new CopyOnWriteArrayList<>();
 
+    // 修改构造函数
     public GameState(ScoreBoard scoreBoard, HighScores highScores, TowerSelector towerSelector,
-                     LeaderboardRepository leaderboardRepository, GameLoader gameLoader) {
+                     LeaderboardRepository leaderboardRepository, GameLoader gameLoader,
+                     CoinManager coinManager) { // 新增参数
         mScoreBoard = scoreBoard;
         mHighScores = highScores;
         mTowerSelector = towerSelector;
         mLeaderboardRepository = leaderboardRepository;
         mGameLoader = gameLoader;
+        mCoinManager = coinManager; // 新增
 
         mScoreBoard.addListener(this);
     }
 
-    // 新增：设置WaveManager的方法
     public void setWaveManager(WaveManager waveManager) {
         mWaveManager = waveManager;
     }
@@ -112,7 +115,12 @@ public class GameState implements ScoreBoard.Listener, Persister {
             mFinalScore = mScoreBoard.getScore();
             mTowerSelector.setControlsEnabled(false);
 
-            // 新增：记录到排行榜
+            // 新增：游戏结束时奖励coin
+            int coinsEarned = calculateCoinsFromScore(mFinalScore);
+            if (coinsEarned > 0) {
+                mCoinManager.addCoins(coinsEarned);
+            }
+
             String currentMapId = mGameLoader.getCurrentMapId();
             mLeaderboardRepository.addEntry(
                     currentMapId,
@@ -137,8 +145,22 @@ public class GameState implements ScoreBoard.Listener, Persister {
         }
     }
 
+    // 新增：根据得分计算coin
+    private int calculateCoinsFromScore(int score) {
+        // 基础奖励：每100分获得1个coin
+        int baseCoins = score / 100;
+
+        // 额外奖励：根据波数给予bonus
+        int waveBonus = 0;
+        if (mWaveManager != null) {
+            waveBonus = mWaveManager.getWaveNumber() * 5;
+        }
+
+        // 确保至少获得一些coin
+        return Math.max(10, baseCoins + waveBonus);
+    }
+
     private int getCurrentWaveNumber() {
-        // 通过 WaveManager 获取当前波数
         return mWaveManager != null ? mWaveManager.getWaveNumber() : 0;
     }
 }

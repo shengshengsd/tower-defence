@@ -2,6 +2,7 @@ package ch.logixisland.anuto.view.game;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import ch.logixisland.anuto.view.leaderboard.LeaderboardActivity;
 
 public class MenuActivity extends AnutoActivity implements View.OnClickListener, View.OnTouchListener {
 
+    private static final String TAG = "MenuActivity";
     private static final int REQUEST_CHANGE_MAP = 1;
     private static final int REQUEST_SETTINGS = 2;
     private static final int REQUEST_LOADMENU = 3;
@@ -43,7 +45,8 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
     private Button btn_load_game;
     private Button btn_enemy_stats;
     private Button btn_settings;
-    private Button btn_leaderboard; // 添加排行榜按钮
+    private Button btn_leaderboard;
+    private Button btn_shop; // 新增商店按钮
 
     public MenuActivity() {
         GameFactory factory = AnutoApplication.getInstance().getGameFactory();
@@ -63,16 +66,26 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        Log.d(TAG, "MenuActivity created, initializing buttons...");
+
         btn_restart = findViewById(R.id.btn_restart);
         btn_change_map = findViewById(R.id.btn_change_map);
         btn_save_game = findViewById(R.id.btn_save_game);
         btn_load_game = findViewById(R.id.btn_load_game);
         btn_enemy_stats = findViewById(R.id.btn_enemy_stats);
         btn_settings = findViewById(R.id.btn_settings);
-        btn_leaderboard = findViewById(R.id.btn_leaderboard); // 初始化排行榜按钮
+        btn_leaderboard = findViewById(R.id.btn_leaderboard);
+        btn_shop = findViewById(R.id.btn_shop); // 初始化商店按钮
 
         activity_menu = findViewById(R.id.activity_menu);
         menu_layout = findViewById(R.id.menu_layout);
+
+        // 检查按钮是否成功初始化
+        if (btn_shop == null) {
+            Log.e(TAG, "Shop button not found! Check if R.id.btn_shop exists in layout.");
+        } else {
+            Log.d(TAG, "Shop button found and initialized.");
+        }
 
         btn_restart.setOnClickListener(this);
         btn_change_map.setOnClickListener(this);
@@ -80,7 +93,9 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
         btn_load_game.setOnClickListener(this);
         btn_enemy_stats.setOnClickListener(this);
         btn_settings.setOnClickListener(this);
-        btn_leaderboard.setOnClickListener(this); // 设置排行榜按钮点击监听
+        btn_leaderboard.setOnClickListener(this);
+        btn_shop.setOnClickListener(this); // 设置商店按钮点击监听
+
         btn_save_game.setEnabled(mGameState.isGameStarted());
         btn_load_game.setEnabled(!mSaveGameRepository.getSaveGameInfos().isEmpty());
 
@@ -90,6 +105,8 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
 
     @Override
     public void onClick(View view) {
+        Log.d(TAG, "Button clicked: " + view.getId());
+
         if (view == btn_restart) {
             mGameLoader.restart();
             finish();
@@ -128,9 +145,22 @@ public class MenuActivity extends AnutoActivity implements View.OnClickListener,
         }
 
         if (view == btn_leaderboard) {
-            // 添加排行榜按钮点击事件，这里实际使用了 LeaderboardActivity
             Intent intent = new Intent(this, LeaderboardActivity.class);
             startActivity(intent);
+            return;
+        }
+
+        // 新增商店按钮点击处理
+        if (view == btn_shop) {
+            Log.d(TAG, "Shop button clicked, starting ShopActivity...");
+            try {
+                Intent intent = new Intent(this, ShopActivity.class);
+                startActivity(intent);
+                Log.d(TAG, "ShopActivity started successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to start ShopActivity: " + e.getMessage(), e);
+                Toast.makeText(this, "Cannot open shop", Toast.LENGTH_SHORT).show();
+            }
             return;
         }
     }

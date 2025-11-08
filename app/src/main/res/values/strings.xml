@@ -143,4 +143,12 @@
     <string name="show_paths">Show Enemy Paths</string>
     <string name="hide_paths">Hide Enemy Paths</string>
 
+    <string name="shop">Shop</string>
+    <string name="coins_format">Coins: %d</string>
+    <string name="price_format">Price: %d</string>
+    <string name="buy">Buy</string>
+    <string name="back">Back</string>
+    <string name="purchase_successful">Purchase successful!</string>
+    <string name="insufficient_coins">Insufficient coins!</string>
+
 </resources>

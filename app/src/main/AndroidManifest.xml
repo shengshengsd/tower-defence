@@ -39,6 +39,14 @@
             android:name=".view.game.MenuActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         </activity>
+
+        <!-- 修改 ShopActivity 注册：使用透明主题，与其他弹窗活动保持一致 -->
+        <activity
+            android:name=".view.game.ShopActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:exported="false">
+        </activity>
+
         <activity
             android:name=".view.setting.SettingsActivity"
             android:label="@string/settings"
@@ -67,7 +75,6 @@
         <activity
             android:name="ch.logixisland.anuto.view.leaderboard.LeaderboardActivity"
             android:theme="@android:style/Theme.Dialog" />
-
 
     </application>
 
