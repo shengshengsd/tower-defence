@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import ch.logixisland.anuto.R;
+import ch.logixisland.anuto.GameFactory;
 import ch.logixisland.anuto.engine.logic.GameEngine;
 import ch.logixisland.anuto.engine.logic.entity.EntityRegistry;
 import ch.logixisland.anuto.engine.logic.loop.ErrorListener;
@@ -38,6 +39,9 @@ public class GameLoader implements ErrorListener {
     private final SaveGameRepository mSaveGameRepository;
     private String mCurrentMapId;
 
+    // 新增：GameFactory引用
+    private GameFactory mGameFactory;
+
     private final SaveGameMigrator mSaveGameMigrator = new SaveGameMigrator();
     private final List<Listener> mListeners = new CopyOnWriteArrayList<>();
 
@@ -53,6 +57,11 @@ public class GameLoader implements ErrorListener {
         mSaveGameRepository = saveGameRepository;
 
         mGameEngine.registerErrorListener(this);
+    }
+
+    // 新增：设置GameFactory的方法
+    public void setGameFactory(GameFactory gameFactory) {
+        mGameFactory = gameFactory;
     }
 
     public void addListener(Listener listener) {
@@ -145,6 +154,11 @@ public class GameLoader implements ErrorListener {
 
         mViewport.setGameSize(map.getWidth(), map.getHeight());
 
+        // 新增：在地图加载后初始化路径显示
+        if (mGameFactory != null) {
+            mGameFactory.initializePathDrawable();
+        }
+
         if (gameState != null) {
             mGamePersister.readState(gameState);
         } else {
@@ -177,5 +191,4 @@ public class GameLoader implements ErrorListener {
             mSaveGameRepository.getAutoSaveStateFile().delete();
         }
     }
-
 }
