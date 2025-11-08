@@ -140,7 +140,4 @@
     <string name="leaderboard_map_all">All Maps</string>
     <string name="close">Close</string>
 
-    <string name="show_paths">Show Enemy Paths</string>
-    <string name="hide_paths">Hide Enemy Paths</string>
-
 </resources>
